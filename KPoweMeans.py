@@ -17,6 +17,7 @@ class KPMCluster:
           self.kmax=size(dataSet,axis=0)/2.0
           self.tmx=max(dataSet[:,0])-min(dataSet[:,0])
           self.Powerx=dataSet[:,-1]
+          self.tvar=var(self.dataset[:,0])*0.5
           
       def training(self,ite):
           self.ite=ite
@@ -48,7 +49,7 @@ class KPMCluster:
       def MCD(self,vA,vB):
           mcd1=(0.5*sum(array([[sin(vA[1])*cos(vA[2])-sin(vB[1])*cos(vB[2])],[sin(vA[1])*cos(vA[2])-sin(vB[1])*cos(vB[2])],[cos(vA[1])-cos(vB[1])]])**2))**0.5
           mcd2=(0.5*sum(array([[sin(vA[3])*cos(vA[4])-sin(vB[3])*cos(vB[4])],[sin(vA[3])*cos(vA[4])-sin(vB[3])*cos(vB[4])],[cos(vA[3])-cos(vB[4])]])**2))**0.5
-          mcd3=(vA[0]-vB[0])/self.tmx
+          mcd3=(vA[0]-vB[0])*self.tvar/(self.tmx**2)
           return sum(mcd1**2+mcd2**2+mcd3**2)**0.5
           
 
@@ -86,7 +87,7 @@ class KPMCluster:
                   ptsInCluster = self.dataset[nonzero(clusterAssment[:,0].A==cent)[0]]#get all the point in this cluster .A 转换成array类
                   Powery=self.Powerx[nonzero(clusterAssment[:,0].A==cent)[0]]
                   if size(ptsInCluster)==0:
-                      centroids[cent,:]=mat([[0,0,0,0,0]])
+                      centroids[cent,:]=centroids[cent,:]
                   else:
                       centroids[cent,:] = sum(multiply(mat(ptsInCluster),mat(Powery).T),axis=0)/sum(Powery)
           return centroids, clusterAssment
@@ -180,5 +181,6 @@ class KPMCluster:
               ax.scatter(self.dataset[i, 3], self.dataset[i, 1], self.dataset[i, 0], c=color[markIndex],S=20)  
           for i in range(self.kopt):  
               ax.scatter(self.centroids[i, 3], self.centroids[i, 1], self.centroids[i, 0], c=color[i],marker=mark[i],s=50)
+          return fig
     
     
